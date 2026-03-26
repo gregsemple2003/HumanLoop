@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
+from app.api.inbox import router as inbox_router
 from app.api.prompts import router as prompts_router
 from app.config import Settings
 from app.db import initialize_database
@@ -42,6 +43,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = resolved_settings
+    app.include_router(inbox_router)
     app.include_router(prompts_router)
 
     @app.get("/healthz", response_model=HealthzResponse)
@@ -66,4 +68,3 @@ def run() -> None:
 
 if __name__ == "__main__":
     run()
-

@@ -1,0 +1,20 @@
+<section id="current-prompt" class="panel" aria-labelledby="current-prompt-heading">
+    <div class="panel-body">
+        <div class="panel-heading">
+            <h2 id="current-prompt-heading">Current prompt</h2>
+            <span class="badge">{{ view.queue_count }} total pending</span>
+        </div>
+        {% if view.current_prompt %}
+        <p class="prompt-meta">
+            Seq {{ view.current_prompt.seq }} from <strong>{{ view.current_prompt.source }}</strong>
+            . Created {{ view.current_prompt.age_label }}.
+            Copy count: {{ view.current_prompt.copy_count }}.
+        </p>
+        <pre class="prompt-body">{{ view.current_prompt.body }}</pre>
+        {% else %}
+        <p class="empty-state">
+            No pending prompts right now. New submissions will appear here after they are ingested.
+        </p>
+        {% endif %}
+    </div>
+</section>

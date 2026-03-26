@@ -1,0 +1,36 @@
+<section
+    id="queue-rail"
+    class="panel"
+    aria-labelledby="queue-rail-heading"
+    hx-get="/inbox/queue"
+    hx-trigger="every 5s"
+    hx-swap="outerHTML"
+>
+    <div class="panel-body">
+        <div class="panel-heading">
+            <h3 id="queue-rail-heading">Pending queue</h3>
+            <span class="badge">{{ view.waiting_count }} waiting</span>
+        </div>
+        <p class="queue-summary">
+            <span id="queue-count">{{ view.queue_count }} total pending</span>
+            <span class="queue-indicator">Refreshing...</span>
+        </p>
+        {% if view.queued_prompts %}
+        <ol class="queue-list">
+            {% for prompt in view.queued_prompts %}
+            <li class="queue-item">
+                <div class="queue-item-header">
+                    <span>Seq {{ prompt.seq }} . {{ prompt.source }}</span>
+                    <span class="queue-meta">{{ prompt.age_label }}</span>
+                </div>
+                <p class="queue-preview">{{ prompt.preview }}</p>
+            </li>
+            {% endfor %}
+        </ol>
+        {% elif view.current_prompt %}
+        <p class="empty-state">No additional prompts are waiting behind the current item.</p>
+        {% else %}
+        <p class="empty-state">The queue is empty. This rail will populate as new prompts arrive.</p>
+        {% endif %}
+    </div>
+</section>

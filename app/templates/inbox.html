@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HumanLoop Inbox</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <style>
+        :root {
+            color-scheme: light;
+            --canvas: #f3efe7;
+            --panel: #fffdf8;
+            --panel-border: #d8cdbd;
+            --ink: #221c16;
+            --muted: #75685a;
+            --accent: #91522f;
+            --accent-soft: #efe0d2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(145, 82, 47, 0.08), transparent 30%),
+                linear-gradient(180deg, #f8f4ed 0%, var(--canvas) 100%);
+            color: var(--ink);
+        }
+
+        .shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.25rem 3rem;
+        }
+
+        .masthead {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: end;
+            margin-bottom: 1.5rem;
+        }
+
+        .eyebrow {
+            margin: 0 0 0.35rem;
+            color: var(--accent);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1;
+        }
+
+        .subhead {
+            margin: 0.5rem 0 0;
+            max-width: 55rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .status-pill {
+            padding: 0.65rem 0.9rem;
+            border: 1px solid var(--panel-border);
+            border-radius: 999px;
+            background: rgba(255, 253, 248, 0.9);
+            color: var(--muted);
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .layout {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: minmax(0, 1.8fr) minmax(20rem, 1fr);
+            align-items: start;
+        }
+
+        .panel {
+            background: rgba(255, 253, 248, 0.92);
+            border: 1px solid var(--panel-border);
+            border-radius: 1.25rem;
+            box-shadow: 0 16px 40px rgba(34, 28, 22, 0.06);
+        }
+
+        .panel-body {
+            padding: 1.25rem;
+        }
+
+        .panel-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .panel-heading h2,
+        .panel-heading h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            border-radius: 999px;
+            padding: 0.3rem 0.65rem;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .prompt-meta,
+        .queue-meta,
+        .empty-state,
+        .queue-summary {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .prompt-meta {
+            margin: 0 0 1rem;
+        }
+
+        .prompt-body {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font: 0.97rem/1.6 Consolas, "Cascadia Code", "Courier New", monospace;
+            padding: 1rem;
+            border-radius: 0.9rem;
+            background: #f7f1e8;
+            border: 1px solid rgba(117, 104, 90, 0.18);
+        }
+
+        .queue-list {
+            list-style: none;
+            margin: 1rem 0 0;
+            padding: 0;
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .queue-item {
+            padding: 0.9rem;
+            border-radius: 0.95rem;
+            border: 1px solid rgba(117, 104, 90, 0.18);
+            background: rgba(247, 241, 232, 0.75);
+        }
+
+        .queue-item-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.35rem;
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        .queue-preview {
+            margin: 0;
+            color: var(--ink);
+            line-height: 1.45;
+        }
+
+        .queue-summary {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .queue-indicator {
+            display: none;
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+
+        .htmx-request .queue-indicator {
+            display: inline;
+        }
+
+        .empty-state {
+            margin: 0;
+            padding: 1rem;
+            border-radius: 0.9rem;
+            background: rgba(247, 241, 232, 0.75);
+            border: 1px dashed rgba(117, 104, 90, 0.28);
+        }
+
+        @media (max-width: 900px) {
+            .masthead,
+            .layout {
+                grid-template-columns: 1fr;
+                display: grid;
+            }
+
+            .status-pill {
+                justify-self: start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="masthead">
+            <div>
+                <p class="eyebrow">HumanLoop</p>
+                <h1>Operator inbox</h1>
+                <p class="subhead">
+                    Review the current prompt without losing your place, while the pending queue rail refreshes in the background.
+                </p>
+            </div>
+            <div class="status-pill">Current stays sticky until you explicitly change queue state.</div>
+        </header>
+        <section class="layout" aria-label="Prompt inbox">
+            {% include "partials/current_prompt.html" %}
+            {% include "partials/queue_rail.html" %}
+        </section>
+    </main>
+</body>
+</html>

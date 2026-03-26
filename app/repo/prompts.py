@@ -110,6 +110,24 @@ def list_prompts(
     return [_row_to_prompt_item(row) for row in rows]
 
 
+def count_prompts(
+    connection: sqlite3.Connection,
+    *,
+    status: str = "pending",
+) -> int:
+    row = connection.execute(
+        """
+        SELECT COUNT(*) AS count
+        FROM prompt_items
+        WHERE status = ?
+        """,
+        (status,),
+    ).fetchone()
+    if row is None:
+        return 0
+    return int(row["count"])
+
+
 def get_prompt_by_id(
     connection: sqlite3.Connection,
     prompt_id: str,
