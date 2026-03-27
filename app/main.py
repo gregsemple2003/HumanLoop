@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
@@ -15,11 +16,16 @@ from app.models import HealthzResponse
 LOGGER = logging.getLogger("humanloop")
 
 
-def configure_logging(level_name: str) -> None:
+def configure_logging(level_name: str, log_path: Path) -> None:
     level = getattr(logging, level_name.upper(), logging.INFO)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=level,
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler(log_path, encoding="utf-8"),
+        ],
         force=True,
     )
 
@@ -29,12 +35,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        configure_logging(resolved_settings.log_level)
+        configure_logging(
+            resolved_settings.log_level,
+            resolved_settings.log_path,
+        )
         initialize_database(resolved_settings.database_path)
         LOGGER.info(
             "HumanLoop database ready at %s",
             resolved_settings.database_path,
         )
+        LOGGER.info("HumanLoop logs writing to %s", resolved_settings.log_path)
         yield
 
     app = FastAPI(

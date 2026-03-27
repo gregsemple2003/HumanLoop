@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "humanloop"
 version = "0.1.0"
 description = "Local prompt inbox MVP for manual ChatGPT handoff."
-readme = "Tracking/task-0001/TASK.md"
+readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.116,<1",

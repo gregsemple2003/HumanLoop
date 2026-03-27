@@ -2,32 +2,32 @@
 
 ## Current State
 
-- Pass 1 durable-ingest proof remains green in `tests/test_ingest.py`.
-- Pass 2 queue-proof coverage was expanded this turn from 11 tests to 16 tests in `tests/test_queue_api.py`.
-- Pass 3 inbox-proof coverage remains green, and pass 4 inbox/operator proof coverage was expanded again this turn from 10 tests to 13 tests in `tests/test_inbox_ui.py`.
-- The inbox now has a real pass-4 operator workflow layer in `app/templates/inbox.html` and `app/templates/partials/current_prompt.html`: clipboard-first Copy, explicit Complete and Dismiss actions, a Requeue recovery control, keyboard shortcuts, status messaging, and a sticky action bar.
-- Pass-4 proof is now stronger at the rendered workflow-contract layer: the inbox tests explicitly prove clipboard-before-record ordering, server-confirmed transition-before-refresh ordering, shortcut gating for editable targets, and operator-facing recovery messaging when actions fail.
-- The earlier pass-3 inbox bug fix remains in place: the inbox still reports accurate durable pending counts at the rail-limit boundary via `app/inbox.py` and `app/repo/prompts.py`.
+- Pass 1 through pass 4 behavior remains green, and the repo test suite now passes at `48 passed` after the pass-5 proof expansion.
+- The app now has an explicit runtime log path via `app/config.py` and `app/main.py`, with startup log lines written to a real local log file.
+- A Windows-first runbook now exists at the repo root in `README.md`, covering startup, shutdown, runtime paths, producer contract details, smoke commands, and recovery expectations.
+- A concrete localhost smoke helper now exists in `scripts/enqueue-sample-prompt.ps1`, which enqueues a sample prompt through `POST /api/prompts` and prints the next operator steps.
+- Pass-5 release-readiness proof now includes `tests/test_release_readiness.py`, which covers localhost-default settings, closed-by-default CORS behavior, runtime log creation, required `README.md` runbook content, and execution of the PowerShell smoke script against a local capture server.
+- Pass-5 live localhost proof now covers the inbox seam more explicitly: a real Uvicorn process was started against a throwaway runtime path, the smoke script created a prompt successfully, `/api/prompts/next` returned that same prompt, `/inbox` rendered the smoke prompt and Copy control, explicit completion drained `/inbox/current`, and the runtime log file contained the expected startup lines.
 
 ## Leftover Cleanup Work
 
-- Add live localhost integration proof for the pass-2 queue reads and action routes and for the pass-3/pass-4 inbox routes against a real app process, not just `TestClient`.
-- Add browser-level proof that the new pass-4 clipboard, keyboard, complete, dismiss, and requeue flow behaves correctly in a real localhost browser session and preserves operator place.
+- Wire the external capture path to this repo’s `POST /api/prompts` endpoint; the producer itself lives outside this workspace, so that seam remains unclosed here.
+- Add browser-level proof that the pass-4 clipboard, keyboard, complete, dismiss, and requeue flow behaves correctly in a real localhost browser session and preserves operator place.
 - Decide whether the queue rail should explicitly communicate that only the first 50 waiting items are rendered when the durable waiting count is larger.
 - Decide and document the intended policy for `copied` on terminal prompts and for repeated `requeue` on already pending prompts so later passes do not rely on an accidental behavior.
 
 ## Follow-Up Bugs Or Questions
 
-- No new failing test or known production bug remains open from this pass.
-- The main open questions are still product-policy and proof-layer ambiguity rather than current broken behavior: terminal-copy semantics, pending-requeue semantics, whether the queue rail needs an explicit truncation indicator when more than 50 waiting items exist, and how much live-browser proof is required before treating pass 4 as closed.
+- No known failing test remains open after the pass-5 proof updates.
+- The main unresolved seams are still out-of-repo producer wiring and proof-layer ambiguity rather than a current broken app behavior: terminal-copy semantics, pending-requeue semantics, whether the queue rail needs an explicit truncation indicator when more than 50 waiting items exist, and how much real-browser proof is required before treating the inbox workflow as fully closed.
 
 ## Known Risks
 
-- Current pass-2 and pass-3 proof still stops at the app-test boundary; it does not yet prove the queue API or inbox routes over a real localhost network hop.
+- The repo now has a stronger live localhost inbox smoke, but it still does not have a real browser harness proving the rendered clipboard/manual workflow against a running page.
 - There is still no concurrency stress proof for simultaneous queue transitions against the same prompt.
-- There is still no browser-driven proof that the new inbox UI controls trigger the correct queue actions while preserving operator place, even though the rendered workflow-script contract is now directly covered by unit tests.
+- The external capture path is still not wired from its own codebase into this repo’s running service.
 - The inbox now shows accurate total pending counts, but the rendered queue rail itself is still capped to the first 50 waiting entries.
 
 ## Recommended Next Step
 
-- Start the next proof layer with a live-process localhost smoke for the queue API and inbox routes, then add real-browser proof for the pass-4 clipboard and explicit queue-action workflow before moving on to pass 5 release-readiness work.
+- Start with the out-of-repo producer wiring seam and a real-browser proof layer for the inbox workflow, rather than widening the MVP feature surface further.

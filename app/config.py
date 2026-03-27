@@ -5,7 +5,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_DATABASE_PATH = PROJECT_ROOT / "data" / "runtime" / "humanloop.db"
+DEFAULT_RUNTIME_PATH = PROJECT_ROOT / "data" / "runtime"
+DEFAULT_DATABASE_PATH = DEFAULT_RUNTIME_PATH / "humanloop.db"
+DEFAULT_LOG_PATH = DEFAULT_RUNTIME_PATH / "logs" / "humanloop.log"
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,6 +16,7 @@ class Settings:
     port: int = 8000
     database_path: Path = DEFAULT_DATABASE_PATH
     log_level: str = "INFO"
+    log_path: Path = DEFAULT_LOG_PATH
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -24,5 +27,7 @@ class Settings:
                 os.getenv("HUMANLOOP_DATABASE_PATH", str(DEFAULT_DATABASE_PATH))
             ).expanduser(),
             log_level=os.getenv("HUMANLOOP_LOG_LEVEL", "INFO"),
+            log_path=Path(
+                os.getenv("HUMANLOOP_LOG_PATH", str(DEFAULT_LOG_PATH))
+            ).expanduser(),
         )
-

@@ -12,5 +12,5 @@ def test_settings(tmp_path: Path) -> Settings:
     return Settings(
         database_path=tmp_path / "humanloop.db",
         log_level="WARNING",
+        log_path=tmp_path / "logs" / "humanloop.log",
     )
-
