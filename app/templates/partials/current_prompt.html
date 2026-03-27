@@ -1,4 +1,12 @@
-<section id="current-prompt" class="panel" aria-labelledby="current-prompt-heading">
+<section
+    id="current-prompt"
+    class="panel"
+    aria-labelledby="current-prompt-heading"
+    {% if view.current_prompt %}
+    data-prompt-id="{{ view.current_prompt.id }}"
+    data-prompt-seq="{{ view.current_prompt.seq }}"
+    {% endif %}
+>
     <div class="panel-body">
         <div class="panel-heading">
             <h2 id="current-prompt-heading">Current prompt</h2>
@@ -8,9 +16,42 @@
         <p class="prompt-meta">
             Seq {{ view.current_prompt.seq }} from <strong>{{ view.current_prompt.source }}</strong>
             . Created {{ view.current_prompt.age_label }}.
-            Copy count: {{ view.current_prompt.copy_count }}.
+            Copy count: <span id="current-copy-count">{{ view.current_prompt.copy_count }}</span>.
         </p>
-        <pre class="prompt-body">{{ view.current_prompt.body }}</pre>
+        <pre id="current-prompt-body" class="prompt-body">{{ view.current_prompt.body }}</pre>
+        <div class="action-bar" aria-label="Current prompt actions">
+            <div class="action-buttons">
+                <button
+                    id="copy-prompt-button"
+                    class="action-button action-button-primary"
+                    type="button"
+                    data-workflow-action="copy"
+                    aria-keyshortcuts="C"
+                >
+                    Copy
+                </button>
+                <button
+                    id="complete-prompt-button"
+                    class="action-button action-button-affirm"
+                    type="button"
+                    data-workflow-action="complete"
+                    aria-keyshortcuts="Enter"
+                >
+                    Complete
+                </button>
+                <button
+                    id="dismiss-prompt-button"
+                    class="action-button action-button-subtle"
+                    type="button"
+                    data-workflow-action="dismiss"
+                    aria-keyshortcuts="D"
+                >
+                    Dismiss
+                </button>
+            </div>
+            <p class="action-shortcuts">Shortcuts: C copy, Enter complete, D dismiss, ? help.</p>
+            <p id="prompt-action-indicator" class="action-indicator" hidden>Working...</p>
+        </div>
         {% else %}
         <p class="empty-state">
             No pending prompts right now. New submissions will appear here after they are ingested.

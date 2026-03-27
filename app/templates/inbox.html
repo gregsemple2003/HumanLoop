@@ -15,6 +15,12 @@
             --muted: #75685a;
             --accent: #91522f;
             --accent-soft: #efe0d2;
+            --success-ink: #184f32;
+            --success-bg: #e8f4ea;
+            --error-ink: #7a2e22;
+            --error-bg: #faebe8;
+            --info-ink: #3e4f61;
+            --info-bg: #edf3f8;
         }
 
         * {
@@ -28,6 +34,14 @@
                 radial-gradient(circle at top right, rgba(145, 82, 47, 0.08), transparent 30%),
                 linear-gradient(180deg, #f8f4ed 0%, var(--canvas) 100%);
             color: var(--ink);
+        }
+
+        button {
+            font: inherit;
+        }
+
+        [hidden] {
+            display: none !important;
         }
 
         .shell {
@@ -123,7 +137,9 @@
         .prompt-meta,
         .queue-meta,
         .empty-state,
-        .queue-summary {
+        .queue-summary,
+        .workflow-status-detail,
+        .action-shortcuts {
             color: var(--muted);
             line-height: 1.5;
         }
@@ -141,6 +157,171 @@
             border-radius: 0.9rem;
             background: #f7f1e8;
             border: 1px solid rgba(117, 104, 90, 0.18);
+        }
+
+        .action-bar {
+            position: sticky;
+            bottom: 0.75rem;
+            margin-top: 1rem;
+            padding: 0.95rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(117, 104, 90, 0.18);
+            background: rgba(255, 253, 248, 0.95);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 24px rgba(34, 28, 22, 0.08);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .action-button {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 0.72rem 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+        }
+
+        .action-button:hover:not(:disabled),
+        .action-button:focus-visible:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(34, 28, 22, 0.08);
+        }
+
+        .action-button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .action-button-primary {
+            background: var(--accent);
+            color: #fffdf8;
+        }
+
+        .action-button-affirm {
+            background: #2f5d3a;
+            color: #fffdf8;
+        }
+
+        .action-button-subtle {
+            background: transparent;
+            border-color: rgba(117, 104, 90, 0.28);
+            color: var(--ink);
+        }
+
+        .action-shortcuts {
+            margin: 0.8rem 0 0;
+            font-size: 0.92rem;
+        }
+
+        .action-indicator {
+            margin: 0.65rem 0 0;
+            color: var(--accent);
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        #current-prompt.is-busy .prompt-body {
+            opacity: 0.72;
+        }
+
+        .workflow-status {
+            margin-bottom: 1rem;
+        }
+
+        .workflow-status-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .workflow-status-text {
+            flex: 1 1 20rem;
+        }
+
+        .workflow-status-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .workflow-status-detail {
+            margin: 0.25rem 0 0;
+        }
+
+        .workflow-status-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .workflow-status[data-kind="success"] {
+            background: rgba(232, 244, 234, 0.94);
+            border-color: rgba(24, 79, 50, 0.2);
+        }
+
+        .workflow-status[data-kind="success"] .workflow-status-title,
+        .workflow-status[data-kind="success"] .workflow-status-detail {
+            color: var(--success-ink);
+        }
+
+        .workflow-status[data-kind="error"] {
+            background: rgba(250, 235, 232, 0.95);
+            border-color: rgba(122, 46, 34, 0.2);
+        }
+
+        .workflow-status[data-kind="error"] .workflow-status-title,
+        .workflow-status[data-kind="error"] .workflow-status-detail {
+            color: var(--error-ink);
+        }
+
+        .workflow-status[data-kind="info"] {
+            background: rgba(237, 243, 248, 0.96);
+            border-color: rgba(62, 79, 97, 0.16);
+        }
+
+        .workflow-status[data-kind="info"] .workflow-status-title,
+        .workflow-status[data-kind="info"] .workflow-status-detail {
+            color: var(--info-ink);
+        }
+
+        .shortcut-help {
+            margin-bottom: 1rem;
+        }
+
+        .shortcut-help-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.65rem 1rem;
+            margin: 0;
+        }
+
+        .shortcut-help-grid dt {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .shortcut-help-grid dd {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .text-button {
+            border: 0;
+            background: transparent;
+            color: var(--accent);
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
         }
 
         .queue-list {
@@ -206,6 +387,10 @@
             .status-pill {
                 justify-self: start;
             }
+
+            .workflow-status-body {
+                align-items: start;
+            }
         }
     </style>
 </head>
@@ -221,10 +406,490 @@
             </div>
             <div class="status-pill">Current stays sticky until you explicitly change queue state.</div>
         </header>
+
+        <section
+            id="workflow-status"
+            class="workflow-status panel"
+            data-kind="info"
+            aria-live="polite"
+            aria-atomic="true"
+        >
+            <div class="panel-body workflow-status-body">
+                <div class="workflow-status-text">
+                    <p id="workflow-status-title" class="workflow-status-title">Manual handoff is ready.</p>
+                    <p id="workflow-status-detail" class="workflow-status-detail">
+                        Copy keeps the current prompt on screen. Complete or Dismiss advances only after the server confirms the queue change.
+                    </p>
+                </div>
+                <div class="workflow-status-actions">
+                    <button
+                        id="requeue-dismissed-button"
+                        class="action-button action-button-subtle"
+                        type="button"
+                        data-workflow-action="requeue"
+                        hidden
+                    >
+                        Requeue dismissed prompt
+                    </button>
+                    <button
+                        id="shortcut-help-toggle"
+                        class="text-button"
+                        type="button"
+                        aria-controls="shortcut-help"
+                        aria-expanded="false"
+                    >
+                        Shortcuts ?
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="shortcut-help" class="shortcut-help panel" hidden>
+            <div class="panel-body">
+                <div class="panel-heading">
+                    <h2>Keyboard loop</h2>
+                    <span class="badge">Pass 4</span>
+                </div>
+                <dl class="shortcut-help-grid">
+                    <dt>C</dt>
+                    <dd>Copy the current prompt to the browser clipboard, then record the copied event without advancing the queue.</dd>
+                    <dt>Enter</dt>
+                    <dd>Complete the current prompt after the server confirms the state change.</dd>
+                    <dt>D</dt>
+                    <dd>Dismiss the current prompt and expose a requeue recovery path.</dd>
+                    <dt>?</dt>
+                    <dd>Toggle this help panel without leaving the inbox.</dd>
+                </dl>
+            </div>
+        </section>
+
         <section class="layout" aria-label="Prompt inbox">
             {% include "partials/current_prompt.html" %}
             {% include "partials/queue_rail.html" %}
         </section>
     </main>
+
+    <script>
+        (() => {
+            const CURRENT_PROMPT_SELECTOR = "#current-prompt";
+            const QUEUE_RAIL_SELECTOR = "#queue-rail";
+            const workflowState = {
+                lastDismissedPromptId: "",
+            };
+
+            function getCurrentPromptElement() {
+                return document.querySelector(CURRENT_PROMPT_SELECTOR);
+            }
+
+            function getCurrentPromptId() {
+                return getCurrentPromptElement()?.dataset.promptId ?? "";
+            }
+
+            function getCurrentPromptBody() {
+                return document.getElementById("current-prompt-body")?.textContent ?? "";
+            }
+
+            function getCurrentPromptButton(action) {
+                return document.querySelector(
+                    `${CURRENT_PROMPT_SELECTOR} [data-workflow-action="${action}"]`,
+                );
+            }
+
+            function getCurrentPromptButtons() {
+                return Array.from(
+                    document.querySelectorAll(
+                        `${CURRENT_PROMPT_SELECTOR} [data-workflow-action]`,
+                    ),
+                );
+            }
+
+            function getStatusElement() {
+                return document.getElementById("workflow-status");
+            }
+
+            function setStatus(kind, title, detail, options = {}) {
+                const status = getStatusElement();
+                const titleElement = document.getElementById("workflow-status-title");
+                const detailElement = document.getElementById("workflow-status-detail");
+                const requeueButton = document.getElementById("requeue-dismissed-button");
+
+                if (!status || !titleElement || !detailElement || !requeueButton) {
+                    return;
+                }
+
+                status.dataset.kind = kind;
+                titleElement.textContent = title;
+                detailElement.textContent = detail;
+
+                const requeuePromptId = options.requeuePromptId ?? "";
+                if (requeuePromptId) {
+                    requeueButton.hidden = false;
+                    requeueButton.dataset.promptId = requeuePromptId;
+                    requeueButton.textContent =
+                        options.requeueLabel ?? "Requeue dismissed prompt";
+                } else {
+                    requeueButton.hidden = true;
+                    delete requeueButton.dataset.promptId;
+                    requeueButton.textContent = "Requeue dismissed prompt";
+                }
+            }
+
+            function setBusy(isBusy, message = "Working...") {
+                const currentPrompt = getCurrentPromptElement();
+                if (!currentPrompt) {
+                    return;
+                }
+
+                currentPrompt.classList.toggle("is-busy", isBusy);
+                currentPrompt.setAttribute("aria-busy", isBusy ? "true" : "false");
+
+                const indicator = document.getElementById("prompt-action-indicator");
+                if (indicator) {
+                    indicator.hidden = !isBusy;
+                    indicator.textContent = message;
+                }
+
+                getCurrentPromptButtons().forEach((button) => {
+                    button.disabled = isBusy;
+                });
+            }
+
+            function focusPreferredAction(action = "copy") {
+                const preferredButton =
+                    getCurrentPromptButton(action) ?? getCurrentPromptButton("copy");
+                if (preferredButton instanceof HTMLElement) {
+                    preferredButton.focus();
+                }
+            }
+
+            function flashCopyButton() {
+                const copyButton = getCurrentPromptButton("copy");
+                if (!(copyButton instanceof HTMLButtonElement)) {
+                    return;
+                }
+
+                const originalLabel = copyButton.dataset.defaultLabel ?? copyButton.textContent;
+                copyButton.dataset.defaultLabel = originalLabel;
+                copyButton.textContent = "Copied";
+
+                window.setTimeout(() => {
+                    if (copyButton.isConnected) {
+                        copyButton.textContent = originalLabel;
+                    }
+                }, 1200);
+            }
+
+            function updateCopyCount(count) {
+                const copyCount = document.getElementById("current-copy-count");
+                if (copyCount) {
+                    copyCount.textContent = String(count);
+                }
+            }
+
+            function parseFragment(html) {
+                const template = document.createElement("template");
+                template.innerHTML = html.trim();
+                return template.content.firstElementChild;
+            }
+
+            async function replaceFragment(selector, url) {
+                const currentElement = document.querySelector(selector);
+                if (!currentElement) {
+                    return;
+                }
+
+                const response = await fetch(url, {
+                    headers: {
+                        Accept: "text/html",
+                        "HX-Request": "true",
+                    },
+                    cache: "no-store",
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Unable to refresh ${selector}.`);
+                }
+
+                const replacement = parseFragment(await response.text());
+                if (!(replacement instanceof HTMLElement)) {
+                    throw new Error(`Unable to refresh ${selector}.`);
+                }
+
+                currentElement.replaceWith(replacement);
+                if (window.htmx) {
+                    window.htmx.process(replacement);
+                }
+            }
+
+            async function refreshInboxFragments() {
+                await Promise.all([
+                    replaceFragment(CURRENT_PROMPT_SELECTOR, "/inbox/current"),
+                    replaceFragment(QUEUE_RAIL_SELECTOR, "/inbox/queue"),
+                ]);
+            }
+
+            async function postPromptAction(promptId, action) {
+                const response = await fetch(
+                    `/api/prompts/${encodeURIComponent(promptId)}/${action}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                        },
+                    },
+                );
+
+                const data = await response.json().catch(() => null);
+                if (!response.ok) {
+                    throw new Error(
+                        data?.detail ?? `Request failed with status ${response.status}.`,
+                    );
+                }
+
+                return data;
+            }
+
+            function toggleShortcutHelp(forceOpen) {
+                const helpPanel = document.getElementById("shortcut-help");
+                const helpToggle = document.getElementById("shortcut-help-toggle");
+                if (!helpPanel || !helpToggle) {
+                    return;
+                }
+
+                const shouldOpen =
+                    typeof forceOpen === "boolean" ? forceOpen : helpPanel.hidden;
+                helpPanel.hidden = !shouldOpen;
+                helpToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+            }
+
+            function shouldIgnoreShortcut(event) {
+                if (event.metaKey || event.ctrlKey || event.altKey) {
+                    return true;
+                }
+
+                const target = event.target;
+                if (!(target instanceof HTMLElement)) {
+                    return false;
+                }
+
+                return Boolean(
+                    target.closest("input, textarea, select, [contenteditable='true']"),
+                );
+            }
+
+            async function handleCopyAction() {
+                const promptId = getCurrentPromptId();
+                if (!promptId) {
+                    setStatus(
+                        "info",
+                        "Queue empty",
+                        "There is no current prompt to copy right now.",
+                    );
+                    return;
+                }
+
+                if (
+                    !navigator.clipboard ||
+                    typeof navigator.clipboard.writeText !== "function"
+                ) {
+                    setStatus(
+                        "error",
+                        "Clipboard unavailable",
+                        "This browser context cannot access the clipboard. Select the prompt text manually and press Ctrl+C.",
+                    );
+                    return;
+                }
+
+                const promptText = getCurrentPromptBody();
+                let clipboardWritten = false;
+                let focusAction = "";
+
+                setBusy(true, "Copying prompt...");
+
+                try {
+                    await navigator.clipboard.writeText(promptText);
+                    clipboardWritten = true;
+
+                    const prompt = await postPromptAction(promptId, "copied");
+                    updateCopyCount(prompt.copy_count);
+                    flashCopyButton();
+                    setStatus(
+                        "success",
+                        "Copied",
+                        `Prompt ${prompt.seq} stayed visible. Complete or Dismiss when you are ready to advance.`,
+                    );
+                    focusAction = "complete";
+                } catch (error) {
+                    const detail =
+                        error instanceof Error ? error.message : "Unknown clipboard failure.";
+
+                    if (clipboardWritten) {
+                        setStatus(
+                            "error",
+                            "Copied locally, but not recorded",
+                            `${detail} The current prompt stayed visible so you can retry without losing your place.`,
+                        );
+                    } else {
+                        setStatus(
+                            "error",
+                            "Copy failed",
+                            `${detail} The current prompt stayed visible so you can try again or copy manually.`,
+                        );
+                    }
+                } finally {
+                    setBusy(false);
+                    if (focusAction) {
+                        focusPreferredAction(focusAction);
+                    }
+                }
+            }
+
+            async function handleTransitionAction(action, promptId = getCurrentPromptId()) {
+                if (!promptId) {
+                    setStatus(
+                        "info",
+                        "Queue empty",
+                        "There is no current prompt to update right now.",
+                    );
+                    return;
+                }
+
+                const busyMessages = {
+                    complete: "Completing prompt...",
+                    dismiss: "Dismissing prompt...",
+                    requeue: "Requeueing prompt...",
+                };
+
+                setBusy(true, busyMessages[action] ?? "Working...");
+
+                try {
+                    const prompt = await postPromptAction(promptId, action);
+                    await refreshInboxFragments();
+
+                    if (action === "complete") {
+                        workflowState.lastDismissedPromptId = "";
+                        setStatus(
+                            "success",
+                            "Completed",
+                            `Prompt ${prompt.seq} was completed. The queue advanced only after the server confirmed the change.`,
+                        );
+                    } else if (action === "dismiss") {
+                        workflowState.lastDismissedPromptId = prompt.id;
+                        setStatus(
+                            "success",
+                            "Dismissed",
+                            `Prompt ${prompt.seq} left the active queue. Use Requeue if you want to restore it.`,
+                            {
+                                requeuePromptId: prompt.id,
+                                requeueLabel: `Requeue prompt ${prompt.seq}`,
+                            },
+                        );
+                    } else if (action === "requeue") {
+                        workflowState.lastDismissedPromptId = "";
+                        setStatus(
+                            "success",
+                            "Requeued",
+                            `Prompt ${prompt.seq} returned to the pending queue. It can become current again immediately if it is still first in line.`,
+                        );
+                    }
+
+                    focusPreferredAction("copy");
+                } catch (error) {
+                    const detail =
+                        error instanceof Error ? error.message : "Unknown queue action failure.";
+                    setStatus(
+                        "error",
+                        "Queue action failed",
+                        `${detail} The visible prompt stayed in place so the UI does not drift from server state.`,
+                    );
+                } finally {
+                    setBusy(false);
+                }
+            }
+
+            document.addEventListener("click", (event) => {
+                const target = event.target;
+                if (!(target instanceof Element)) {
+                    return;
+                }
+
+                const actionButton = target.closest("[data-workflow-action]");
+                if (!(actionButton instanceof HTMLButtonElement) || actionButton.disabled) {
+                    return;
+                }
+
+                const action = actionButton.dataset.workflowAction ?? "";
+                if (action === "copy") {
+                    event.preventDefault();
+                    void handleCopyAction();
+                    return;
+                }
+
+                if (action === "complete" || action === "dismiss") {
+                    event.preventDefault();
+                    void handleTransitionAction(action);
+                    return;
+                }
+
+                if (action === "requeue") {
+                    event.preventDefault();
+                    const promptId =
+                        actionButton.dataset.promptId || workflowState.lastDismissedPromptId;
+                    if (!promptId) {
+                        setStatus(
+                            "info",
+                            "Nothing to requeue",
+                            "Dismiss a prompt first if you need a recovery path.",
+                        );
+                        return;
+                    }
+
+                    void handleTransitionAction("requeue", promptId);
+                }
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (shouldIgnoreShortcut(event)) {
+                    return;
+                }
+
+                if (event.key === "?" || (event.key === "/" && event.shiftKey)) {
+                    event.preventDefault();
+                    toggleShortcutHelp();
+                    return;
+                }
+
+                if (event.key === "c" || event.key === "C") {
+                    const copyButton = getCurrentPromptButton("copy");
+                    if (copyButton && !copyButton.disabled) {
+                        event.preventDefault();
+                        copyButton.click();
+                    }
+                    return;
+                }
+
+                if (event.key === "d" || event.key === "D") {
+                    const dismissButton = getCurrentPromptButton("dismiss");
+                    if (dismissButton && !dismissButton.disabled) {
+                        event.preventDefault();
+                        dismissButton.click();
+                    }
+                    return;
+                }
+
+                if (event.key === "Enter") {
+                    const completeButton = getCurrentPromptButton("complete");
+                    if (completeButton && !completeButton.disabled) {
+                        event.preventDefault();
+                        completeButton.click();
+                    }
+                }
+            });
+
+            document
+                .getElementById("shortcut-help-toggle")
+                ?.addEventListener("click", () => toggleShortcutHelp());
+        })();
+    </script>
 </body>
 </html>
