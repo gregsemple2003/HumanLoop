@@ -2,7 +2,7 @@
 
 ## Scope
 
-Pass 3 in `Tracking/task-0001/PLAN.md` covers the server-rendered inbox vertical slice:
+Pass 3 in `Tracking/Task-0001/PLAN.md` covers the server-rendered inbox vertical slice:
 
 - `GET /inbox`
 - `GET /inbox/current`
@@ -15,8 +15,8 @@ Pass 3 in `Tracking/task-0001/PLAN.md` covers the server-rendered inbox vertical
 
 Grounding note:
 
-- `exemplars/PASS_3_AUDIT.md` was not present in this workspace.
-- This audit grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, `Tracking/task-0001/HANDOFF.md`, the prior audits in `Tracking/task-0001/Testing/PASS_1_AUDIT.md` and `Tracking/task-0001/Testing/PASS_2_AUDIT.md`, the existing inbox implementation under `app/`, and the closest unit slice in `tests/test_inbox_ui.py`.
+- `C:\Users\gregs\.codex\Orchestration\Exemplars\PASS-AUDIT-0003.md` was not present in this workspace.
+- This audit grounded on `Tracking/Task-0001/TASK.md`, `Tracking/Task-0001/PLAN.md`, `Tracking/Task-0001/HANDOFF.md`, the prior audits in `Tracking/Task-0001/Testing/PASS-AUDIT-0001.md` and `Tracking/Task-0001/Testing/PASS-AUDIT-0002.md`, the existing inbox implementation under `app/`, and the closest unit slice in `tests/test_inbox_ui.py`.
 
 ## Expansion Summary
 

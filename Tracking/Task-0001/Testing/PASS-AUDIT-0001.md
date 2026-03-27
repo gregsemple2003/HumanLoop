@@ -2,7 +2,7 @@
 
 ## Scope
 
-Pass 1 in `Tracking/task-0001/PLAN.md` covers the durable ingest seam:
+Pass 1 in `Tracking/Task-0001/PLAN.md` covers the durable ingest seam:
 
 - SQLite-backed `prompt_items` storage
 - `POST /api/prompts`
@@ -13,11 +13,11 @@ Pass 1 in `Tracking/task-0001/PLAN.md` covers the durable ingest seam:
 
 Baseline note:
 
-- `Tracking/task-0001/HANDOFF.md` was not present during this pass.
-- No prior `Tracking/task-0001/Testing/pass_*_audit.md` files were present to mirror.
-- `exemplars/PASS_3_AUDIT.md` was not present in this workspace.
+- `Tracking/Task-0001/HANDOFF.md` was not present during this pass.
+- No prior `Tracking/Task-0001/Testing/PASS-AUDIT-*.md` files were present to mirror.
+- `C:\Users\gregs\.codex\Orchestration\Exemplars\PASS-AUDIT-0003.md` was not present in this workspace.
 
-This audit therefore grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, and the existing ingest unit tests in `tests/test_ingest.py`.
+This audit therefore grounded on `Tracking/Task-0001/TASK.md`, `Tracking/Task-0001/PLAN.md`, and the existing ingest unit tests in `tests/test_ingest.py`.
 
 ## Expansion Summary
 

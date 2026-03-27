@@ -255,4 +255,4 @@ Cover:
 - no Docker, Redis, RabbitMQ, React, Electron, or browser automation in MVP
 - strict FIFO operator model where only the head prompt is actionable
 - no ingest auth in MVP
-- the saved source of truth is `Tracking/task-0001/TASK.md` and `Tracking/task-0001/RESEARCH.md`
+- the saved source of truth is `Tracking/Task-0001/TASK.md` and `Tracking/Task-0001/RESEARCH.md`

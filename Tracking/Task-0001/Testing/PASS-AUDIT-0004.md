@@ -2,7 +2,7 @@
 
 ## Scope
 
-Pass 4 in `Tracking/task-0001/PLAN.md` covers the clipboard and operator workflow layer on top of the existing inbox:
+Pass 4 in `Tracking/Task-0001/PLAN.md` covers the clipboard and operator workflow layer on top of the existing inbox:
 
 - browser-initiated copy via `navigator.clipboard.writeText()`
 - explicit Complete and Dismiss actions
@@ -16,7 +16,7 @@ Pass 4 in `Tracking/task-0001/PLAN.md` covers the clipboard and operator workflo
 Grounding note:
 
 - `AGENTS.md` was not present as a physical workspace file, so this pass followed the instructions provided in the task prompt.
-- `README.md`, `RESEARCH_PLAN.md`, and `Tracking/task-0001/Design/` were not present in this workspace, so this pass grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, `Tracking/task-0001/HANDOFF.md`, `Tracking/task-0001/RESEARCH.md`, the prior testing audits, the current inbox/API implementation under `app/`, and the inbox/queue test suite under `tests/`.
+- `README.md`, `RESEARCH-PLAN.md`, and `Tracking/Task-0001/Design/` were not present in this workspace, so this pass grounded on `Tracking/Task-0001/TASK.md`, `Tracking/Task-0001/PLAN.md`, `Tracking/Task-0001/HANDOFF.md`, `Tracking/Task-0001/RESEARCH.md`, the prior testing audits, the current inbox/API implementation under `app/`, and the inbox/queue test suite under `tests/`.
 
 ## Expansion Summary
 

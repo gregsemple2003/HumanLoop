@@ -8,9 +8,9 @@ Use it when the app is being sanity-checked as a real operator workflow instead 
 
 Keep executed regression-run results under the task that owns the current work:
 
-- `Tracking/task-<id>/Testing/REGRESSION-RUN-<N>.md`
+- `Tracking/Task-<id>/Testing/REGRESSION-RUN-<NNNN>.md`
 
-The task-local [Tracking/task-0001/Testing/REGRESSION.md](/c:/Agent/HumanLoop/Tracking/task-0001/Testing/REGRESSION.md) file is retained as historical task context, but this repo-root file is the canonical checklist going forward.
+This repo-root file is the canonical checklist going forward.
 
 ## Environment Bootstrap
 
@@ -128,7 +128,7 @@ Expected result:
 
 Related bug note:
 
-- [BUG1.md](/c:/Agent/HumanLoop/Tracking/task-0001/Testing/BUG1.md)
+- [BUG-0001.md](/c:/Agent/HumanLoop/Tracking/Task-0001/BUG-0001.md)
 
 Goal:
 Confirm the copy path resolves cleanly instead of hanging the action bar.
@@ -273,5 +273,5 @@ Confirm:
 
 - [README.md](/c:/Agent/HumanLoop/README.md) matches the current runbook and runtime paths
 - [HANDOFF.md](/c:/Agent/HumanLoop/HANDOFF.md) still points at the correct canonical task handoff
-- [Tracking/task-0001/HANDOFF.md](/c:/Agent/HumanLoop/Tracking/task-0001/HANDOFF.md) reflects the current local baseline
-- the relevant pass audit under `Tracking/task-0001/Testing/` records the latest proof run
+- [Tracking/Task-0001/HANDOFF.md](/c:/Agent/HumanLoop/Tracking/Task-0001/HANDOFF.md) reflects the current local baseline
+- the relevant pass audit under `Tracking/Task-0001/Testing/` records the latest proof run

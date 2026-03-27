@@ -1,5 +1,7 @@
 # Task 0001
 
+This file is the canonical task definition and task-owned entry point for HumanLoop task tracking.
+
 ## Title
 
 Local prompt inbox MVP for queued manual ChatGPT handoff.
@@ -19,7 +21,7 @@ This task exists to turn the current research into the first concrete implementa
 
 ## Synced Baseline From Existing Repo Notes
 
-This task is intentionally aligned with the current repo research in `Tracking/task-0001/RESEARCH.md`.
+This task is intentionally aligned with the current repo research in `Tracking/Task-0001/RESEARCH.md`.
 
 Current assumptions already documented in the repo:
 
@@ -49,7 +51,7 @@ For MVP, "working" means:
 
 ## Proposed Repo Home
 
-Keep task tracking under `Tracking/task-0001/`.
+Keep task tracking under `Tracking/Task-0001/`.
 
 Proposed implementation home for the first application code:
 
@@ -318,4 +320,4 @@ This is the smallest slice that turns the current HumanLoop concept into a durab
 
 Use these repo notes as the source of truth for the first implementation:
 
-- `Tracking/task-0001/RESEARCH.md`
+- `Tracking/Task-0001/RESEARCH.md`

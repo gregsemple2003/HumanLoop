@@ -2,7 +2,7 @@
 
 ## Scope
 
-Pass 2 in `Tracking/task-0001/PLAN.md` covers the queue read API and durable state transitions:
+Pass 2 in `Tracking/Task-0001/PLAN.md` covers the queue read API and durable state transitions:
 
 - `GET /api/prompts?status=pending&limit=50`
 - `GET /api/prompts/next`
@@ -17,9 +17,9 @@ Pass 2 in `Tracking/task-0001/PLAN.md` covers the queue read API and durable sta
 
 Grounding note:
 
-- `Tracking/task-0001/HANDOFF.md` did not exist when this proof pass started and was added at close-out to capture the remaining risks and follow-up work.
-- `exemplars/PASS_3_AUDIT.md` was not present in this workspace.
-- This audit grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, `Tracking/task-0001/Testing/PASS_1_AUDIT.md`, the current queue implementation under `app/`, and the closest existing unit slices in `tests/test_ingest.py` and `tests/test_queue_api.py`.
+- `Tracking/Task-0001/HANDOFF.md` did not exist when this proof pass started and was added at close-out to capture the remaining risks and follow-up work.
+- `C:\Users\gregs\.codex\Orchestration\Exemplars\PASS-AUDIT-0003.md` was not present in this workspace.
+- This audit grounded on `Tracking/Task-0001/TASK.md`, `Tracking/Task-0001/PLAN.md`, `Tracking/Task-0001/Testing/PASS-AUDIT-0001.md`, the current queue implementation under `app/`, and the closest existing unit slices in `tests/test_ingest.py` and `tests/test_queue_api.py`.
 
 ## Expansion Summary
 
