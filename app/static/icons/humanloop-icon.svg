@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="HumanLoop icon">
+  <rect x="40" y="40" width="432" height="432" rx="112" fill="#91522f"/>
+  <rect x="40" y="40" width="432" height="432" rx="112" fill="none" stroke="#e7d1b6" stroke-width="16"/>
+  <rect x="146" y="128" width="54" height="256" rx="27" fill="#fff8ef"/>
+  <rect x="312" y="128" width="54" height="256" rx="27" fill="#fff8ef"/>
+  <rect x="188" y="229" width="136" height="54" rx="27" fill="#fff8ef"/>
+  <circle cx="354" cy="354" r="42" fill="none" stroke="#221c16" stroke-width="18"/>
+  <path d="M382 330l0 36 28 0" fill="none" stroke="#221c16" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -15,7 +15,7 @@ Baseline note:
 
 - `Tracking/task-0001/HANDOFF.md` was not present during this pass.
 - No prior `Tracking/task-0001/Testing/pass_*_audit.md` files were present to mirror.
-- `exemplars/pass_3_audit.md` was not present in this workspace.
+- `exemplars/PASS_3_AUDIT.md` was not present in this workspace.
 
 This audit therefore grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, and the existing ingest unit tests in `tests/test_ingest.py`.
 

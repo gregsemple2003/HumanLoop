@@ -16,6 +16,10 @@ from app.main import create_app
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 README_PATH = PROJECT_ROOT / "README.md"
 SMOKE_SCRIPT_PATH = PROJECT_ROOT / "scripts" / "enqueue-sample-prompt.ps1"
+DESKTOP_IDLE_ICON_PATH = PROJECT_ROOT / "app" / "static" / "icons" / "humanloop-desktop-idle.ico"
+DESKTOP_ALERT_ICON_PATH = PROJECT_ROOT / "app" / "static" / "icons" / "humanloop-desktop-alert.ico"
+DESKTOP_IDLE_ICON_32_PATH = PROJECT_ROOT / "app" / "static" / "icons" / "humanloop-desktop-idle-32.png"
+DESKTOP_ALERT_ICON_32_PATH = PROJECT_ROOT / "app" / "static" / "icons" / "humanloop-desktop-alert-32.png"
 
 
 def test_settings_default_to_localhost_runtime_paths(monkeypatch) -> None:
@@ -63,12 +67,69 @@ def test_app_startup_writes_runtime_logs_to_the_configured_log_path(
     assert "HumanLoop logs writing to" in log_text
 
 
+def test_app_serves_manifest_and_custom_icon_assets(test_settings) -> None:
+    with TestClient(create_app(test_settings)) as client:
+        manifest = client.get("/static/manifest.webmanifest")
+        icon = client.get("/static/icons/humanloop-192.png")
+        svg_icon = client.get("/static/icons/humanloop-icon.svg")
+
+    assert manifest.status_code == 200
+    assert manifest.headers["content-type"].startswith("application/manifest+json")
+
+    manifest_payload = manifest.json()
+    assert manifest_payload["name"] == "HumanLoop Inbox"
+    assert manifest_payload["start_url"] == "/inbox"
+    assert manifest_payload["display"] == "standalone"
+    assert manifest_payload["icons"] == [
+        {
+            "src": "/static/icons/humanloop-icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any",
+        },
+        {
+            "src": "/static/icons/humanloop-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable",
+        },
+        {
+            "src": "/static/icons/humanloop-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable",
+        },
+    ]
+
+    assert icon.status_code == 200
+    assert icon.headers["content-type"].startswith("image/png")
+    assert len(icon.content) > 0
+
+    assert svg_icon.status_code == 200
+    assert svg_icon.headers["content-type"].startswith("image/svg+xml")
+    assert "<svg" in svg_icon.text
+
+
+def test_desktop_wrapper_icon_variants_are_present() -> None:
+    assert DESKTOP_IDLE_ICON_PATH.exists()
+    assert DESKTOP_IDLE_ICON_PATH.stat().st_size > 0
+    assert DESKTOP_ALERT_ICON_PATH.exists()
+    assert DESKTOP_ALERT_ICON_PATH.stat().st_size > 0
+    assert DESKTOP_IDLE_ICON_32_PATH.exists()
+    assert DESKTOP_IDLE_ICON_32_PATH.stat().st_size > 0
+    assert DESKTOP_ALERT_ICON_32_PATH.exists()
+    assert DESKTOP_ALERT_ICON_32_PATH.stat().st_size > 0
+
+
 def test_readme_documents_the_pass_five_runbook_contract() -> None:
     readme_text = README_PATH.read_text(encoding="utf-8")
 
     assert "# HumanLoop" in readme_text
     assert "## Quick Start" in readme_text
     assert ".\\.venv\\Scripts\\python.exe -m uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000" in readme_text
+    assert ".\\.venv\\Scripts\\python.exe -m pip install -e .[desktop]" in readme_text
+    assert ".\\.venv\\Scripts\\humanloop-desktop.exe" in readme_text
+    assert ".\\scripts\\start-humanloop-desktop.ps1" in readme_text
     assert "Stop the app with `Ctrl+C`" in readme_text
     assert "## Runtime Paths" in readme_text
     assert "data/runtime/humanloop.db" in readme_text

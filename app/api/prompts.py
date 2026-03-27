@@ -7,16 +7,25 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
 from app.db import get_connection
-from app.models import PromptIngestRequest, PromptItem, PromptResponse, PromptStatus
+from app.models import (
+    PromptIngestRequest,
+    PromptItem,
+    PromptQueueHeadResponse,
+    PromptQueueSummaryResponse,
+    PromptResponse,
+    PromptStatus,
+)
 from app.repo.prompts import (
     IdempotencyConflictError,
     PromptNotFoundError,
     PromptStateConflictError,
+    count_prompts,
     complete_prompt,
     dismiss_prompt,
     get_next_prompt,
     get_prompt_by_id,
     ingest_prompt,
+    latest_prompt_seq,
     list_prompts,
     record_prompt_copied,
     requeue_prompt,
@@ -80,6 +89,25 @@ def get_next_pending_prompt(
             detail="No pending prompts found.",
         )
     return PromptResponse.from_prompt(prompt)
+
+
+@router.get(
+    "/api/prompts/summary",
+    response_model=PromptQueueSummaryResponse,
+)
+def get_prompt_summary(
+    connection: DatabaseConnection,
+) -> PromptQueueSummaryResponse:
+    current_prompt = get_next_prompt(connection)
+    return PromptQueueSummaryResponse(
+        pending_count=count_prompts(connection, status="pending"),
+        current_prompt=(
+            PromptQueueHeadResponse.from_prompt(current_prompt)
+            if current_prompt is not None
+            else None
+        ),
+        latest_pending_seq=latest_prompt_seq(connection, status="pending"),
+    )
 
 
 @router.get(

@@ -16,7 +16,7 @@ Pass 5 in `Tracking/task-0001/PLAN.md` covers integration and release-readiness 
 Grounding note:
 
 - `AGENTS.md` was not present as a physical workspace file, so this pass followed the instructions provided in the task prompt.
-- `Tracking/task-0001/exemplars/pass_3_audit.md` was not present in this workspace, so this audit grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, `Tracking/task-0001/HANDOFF.md`, the earlier audits under `Tracking/task-0001/Testing/`, the current app under `app/`, the release-readiness slice in `tests/test_release_readiness.py`, and the existing durability proof in `tests/test_ingest.py`.
+- `Tracking/task-0001/exemplars/PASS_3_AUDIT.md` was not present in this workspace, so this audit grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, `Tracking/task-0001/HANDOFF.md`, the earlier audits under `Tracking/task-0001/Testing/`, the current app under `app/`, the release-readiness slice in `tests/test_release_readiness.py`, and the existing durability proof in `tests/test_ingest.py`.
 
 ## Expansion Summary
 

@@ -10,6 +10,12 @@ Install the app and test tooling into the local virtual environment:
 .\.venv\Scripts\python.exe -m pip install -e .[dev]
 ```
 
+Install the optional desktop wrapper if you want a native window with a real app icon and tray notifications:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e .[desktop]
+```
+
 Start the app on localhost:
 
 ```powershell
@@ -19,6 +25,24 @@ Start the app on localhost:
 Open the operator inbox at [http://127.0.0.1:8000/inbox](http://127.0.0.1:8000/inbox).
 
 Stop the app with `Ctrl+C` in the terminal that started Uvicorn.
+
+Start the native desktop wrapper:
+
+```powershell
+.\.venv\Scripts\humanloop-desktop.exe
+```
+
+Or use the bundled launcher script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start-humanloop-desktop.ps1
+```
+
+## App Window Tips
+
+If you save HumanLoop as a Chrome app window, refresh or recreate the shortcut after icon changes so Chrome can pick up the new manifest assets. The native desktop wrapper avoids Chrome profile badging, uses the HumanLoop icon directly, and labels its window as `HumanLoop Desktop` so it is easier to distinguish from the browser-hosted version.
+
+Desktop toasts are opt-in in the browser-hosted version. The native desktop wrapper uses Windows tray notifications to announce new prompts while the window is in the background, switches between idle and alert taskbar icons based on queue depth, and flashes the taskbar button when new prompts arrive off-focus.
 
 ## Runtime Paths
 

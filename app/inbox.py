@@ -40,6 +40,7 @@ class InboxView:
     queued_prompts: list[InboxQueueEntry]
     queue_count: int
     waiting_count: int
+    window_title: str
 
 
 def build_inbox_view(connection) -> InboxView:
@@ -57,6 +58,7 @@ def build_inbox_view(connection) -> InboxView:
         queued_prompts=[_to_queue_entry(prompt) for prompt in waiting_prompts],
         queue_count=queue_count,
         waiting_count=max(queue_count - 1, 0),
+        window_title=_window_title(queue_count),
     )
 
 
@@ -118,6 +120,13 @@ def _age_label(value: str) -> str:
     delta_days = delta_hours // 24
     unit = "day" if delta_days == 1 else "days"
     return f"{delta_days} {unit} ago"
+
+
+def _window_title(queue_count: int) -> str:
+    if queue_count <= 0:
+        return "HumanLoop Inbox"
+
+    return f"HumanLoop Inbox ({queue_count} pending)"
 
 
 def _parse_timestamp(value: str) -> datetime:

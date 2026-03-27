@@ -121,6 +121,44 @@ def test_get_next_prompt_returns_404_when_queue_is_empty(test_settings) -> None:
     assert response.json()["detail"] == "No pending prompts found."
 
 
+def test_get_prompt_summary_reports_pending_count_current_head_and_latest_seq(
+    test_settings,
+) -> None:
+    with TestClient(create_app(test_settings)) as client:
+        first = _enqueue_prompt(client, "025")
+        second = _enqueue_prompt(client, "026")
+        _enqueue_prompt(client, "027")
+
+        dismiss = client.post(f"/api/prompts/{second['id']}/dismiss")
+        response = client.get("/api/prompts/summary")
+
+    assert dismiss.status_code == 200
+    assert response.status_code == 200
+    assert response.json() == {
+        "pending_count": 2,
+        "current_prompt": {
+            "id": first["id"],
+            "seq": first["seq"],
+            "source": first["source"],
+        },
+        "latest_pending_seq": 3,
+    }
+
+
+def test_get_prompt_summary_returns_empty_shape_when_queue_is_empty(
+    test_settings,
+) -> None:
+    with TestClient(create_app(test_settings)) as client:
+        response = client.get("/api/prompts/summary")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "pending_count": 0,
+        "current_prompt": None,
+        "latest_pending_seq": None,
+    }
+
+
 def test_get_prompt_by_id_returns_prompt_and_404_for_unknown_id(
     test_settings,
 ) -> None:

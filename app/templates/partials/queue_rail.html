@@ -2,6 +2,8 @@
     id="queue-rail"
     class="panel"
     aria-labelledby="queue-rail-heading"
+    data-queue-count="{{ view.queue_count }}"
+    data-waiting-count="{{ view.waiting_count }}"
     hx-get="/inbox/queue"
     hx-trigger="every 5s"
     hx-swap="outerHTML"

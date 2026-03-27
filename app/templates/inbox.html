@@ -3,7 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HumanLoop Inbox</title>
+    <title>{{ view.window_title }}</title>
+    <meta name="theme-color" content="#91522f">
+    <link rel="manifest" href="/static/manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="/static/icons/humanloop-icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/humanloop-32.png">
+    <link rel="shortcut icon" href="/static/icons/favicon.ico">
+    <link rel="apple-touch-icon" href="/static/icons/humanloop-192.png">
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <style>
         :root {
@@ -432,6 +438,13 @@
                         Requeue dismissed prompt
                     </button>
                     <button
+                        id="notification-toggle-button"
+                        class="action-button action-button-subtle"
+                        type="button"
+                    >
+                        Enable toasts
+                    </button>
+                    <button
                         id="shortcut-help-toggle"
                         class="text-button"
                         type="button"
@@ -473,12 +486,25 @@
         (() => {
             const CURRENT_PROMPT_SELECTOR = "#current-prompt";
             const QUEUE_RAIL_SELECTOR = "#queue-rail";
+            const APP_ICON_URL = "/static/icons/humanloop-192.png";
+            const TOAST_PREFERENCE_KEY = "humanloop.notifications.enabled";
             const workflowState = {
                 lastDismissedPromptId: "",
+            };
+            const notificationState = {
+                initialized: false,
+                lastQueueCount: 0,
+            };
+            const currentRefreshState = {
+                inFlight: false,
             };
 
             function getCurrentPromptElement() {
                 return document.querySelector(CURRENT_PROMPT_SELECTOR);
+            }
+
+            function getQueueRailElement() {
+                return document.querySelector(QUEUE_RAIL_SELECTOR);
             }
 
             function getCurrentPromptId() {
@@ -503,8 +529,204 @@
                 );
             }
 
+            function getNotificationToggleButton() {
+                return document.getElementById("notification-toggle-button");
+            }
+
+            function getQueueCount() {
+                const queueCount = Number.parseInt(
+                    getQueueRailElement()?.dataset.queueCount ?? "0",
+                    10,
+                );
+
+                if (Number.isNaN(queueCount) || queueCount < 0) {
+                    return 0;
+                }
+
+                return queueCount;
+            }
+
             function getStatusElement() {
                 return document.getElementById("workflow-status");
+            }
+
+            function supportsToastNotifications() {
+                return typeof Notification !== "undefined";
+            }
+
+            function getToastPermission() {
+                if (!supportsToastNotifications()) {
+                    return "unsupported";
+                }
+
+                return Notification.permission;
+            }
+
+            function readToastPreference() {
+                try {
+                    return window.localStorage.getItem(TOAST_PREFERENCE_KEY) === "true";
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            function writeToastPreference(enabled) {
+                try {
+                    window.localStorage.setItem(
+                        TOAST_PREFERENCE_KEY,
+                        enabled ? "true" : "false",
+                    );
+                } catch (error) {
+                    // Ignore local storage failures so the inbox still works.
+                }
+            }
+
+            function areToastsEnabled() {
+                return getToastPermission() === "granted" && readToastPreference();
+            }
+
+            function updateNotificationToggle() {
+                const button = getNotificationToggleButton();
+                if (!(button instanceof HTMLButtonElement)) {
+                    return;
+                }
+
+                const permission = getToastPermission();
+                button.hidden = false;
+                button.disabled = false;
+
+                if (permission === "unsupported") {
+                    button.textContent = "Toasts unavailable";
+                    button.disabled = true;
+                    return;
+                }
+
+                if (permission === "denied") {
+                    button.textContent = "Toasts blocked";
+                    return;
+                }
+
+                if (areToastsEnabled()) {
+                    button.textContent = "Toasts on";
+                    return;
+                }
+
+                button.textContent = "Enable toasts";
+            }
+
+            function formatInboxTitle(queueCount) {
+                if (queueCount <= 0) {
+                    return "HumanLoop Inbox";
+                }
+
+                return `HumanLoop Inbox (${queueCount} pending)`;
+            }
+
+            async function syncAppBadge(queueCount) {
+                try {
+                    if (queueCount > 0) {
+                        if (typeof navigator.setAppBadge !== "function") {
+                            return;
+                        }
+
+                        await navigator.setAppBadge(queueCount);
+                        return;
+                    }
+
+                    if (typeof navigator.clearAppBadge === "function") {
+                        await navigator.clearAppBadge();
+                    }
+                } catch (error) {
+                    // Ignore unsupported browser/platform badge failures.
+                }
+            }
+
+            function shouldNotifyAboutQueueIncrease(previousQueueCount, queueCount) {
+                if (!notificationState.initialized) {
+                    return false;
+                }
+
+                if (queueCount <= previousQueueCount) {
+                    return false;
+                }
+
+                if (!areToastsEnabled()) {
+                    return false;
+                }
+
+                return document.hidden || !document.hasFocus();
+            }
+
+            function showToastNotification(title, body) {
+                if (getToastPermission() !== "granted") {
+                    return;
+                }
+
+                const notification = new Notification(title, {
+                    body,
+                    icon: APP_ICON_URL,
+                    tag: "humanloop-queue",
+                });
+
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+            }
+
+            function maybeNotifyQueueIncrease(previousQueueCount, queueCount) {
+                if (!shouldNotifyAboutQueueIncrease(previousQueueCount, queueCount)) {
+                    return;
+                }
+
+                const addedCount = queueCount - previousQueueCount;
+                const title =
+                    addedCount === 1
+                        ? "HumanLoop: 1 new prompt"
+                        : `HumanLoop: ${addedCount} new prompts`;
+                const body =
+                    queueCount === 1
+                        ? "There is 1 pending prompt waiting in the inbox."
+                        : `There are ${queueCount} pending prompts waiting in the inbox.`;
+
+                showToastNotification(title, body);
+            }
+
+            async function refreshCurrentPromptFromServer() {
+                if (currentRefreshState.inFlight) {
+                    return;
+                }
+
+                currentRefreshState.inFlight = true;
+                try {
+                    await replaceFragment(CURRENT_PROMPT_SELECTOR, "/inbox/current");
+                } catch (error) {
+                    // Ignore background refresh failures so operator actions stay stable.
+                } finally {
+                    currentRefreshState.inFlight = false;
+                }
+            }
+
+            function applyExternalQueueSignals(options = {}) {
+                const currentAlreadySynchronized =
+                    options.currentAlreadySynchronized ?? false;
+                const queueCount = getQueueCount();
+                const previousQueueCount = notificationState.lastQueueCount;
+                const hadPreviousQueueCount = notificationState.initialized;
+
+                document.title = formatInboxTitle(queueCount);
+                void syncAppBadge(queueCount);
+                updateNotificationToggle();
+
+                if (hadPreviousQueueCount) {
+                    maybeNotifyQueueIncrease(previousQueueCount, queueCount);
+                    if (!currentAlreadySynchronized && queueCount !== previousQueueCount) {
+                        void refreshCurrentPromptFromServer();
+                    }
+                }
+
+                notificationState.lastQueueCount = queueCount;
+                notificationState.initialized = true;
             }
 
             function setStatus(kind, title, detail, options = {}) {
@@ -626,6 +848,7 @@
                     replaceFragment(CURRENT_PROMPT_SELECTOR, "/inbox/current"),
                     replaceFragment(QUEUE_RAIL_SELECTOR, "/inbox/queue"),
                 ]);
+                applyExternalQueueSignals({ currentAlreadySynchronized: true });
             }
 
             async function postPromptAction(promptId, action) {
@@ -674,6 +897,79 @@
 
                 return Boolean(
                     target.closest("input, textarea, select, [contenteditable='true']"),
+                );
+            }
+
+            async function handleNotificationToggle() {
+                const permission = getToastPermission();
+
+                if (permission === "unsupported") {
+                    setStatus(
+                        "error",
+                        "Toasts unavailable",
+                        "This browser context does not support desktop notifications for HumanLoop.",
+                    );
+                    updateNotificationToggle();
+                    return;
+                }
+
+                if (permission === "denied") {
+                    setStatus(
+                        "error",
+                        "Toasts blocked",
+                        "Browser notification permission is blocked for this app window. Re-enable notifications in the site settings if you want desktop alerts.",
+                    );
+                    updateNotificationToggle();
+                    return;
+                }
+
+                if (permission !== "granted") {
+                    const result = await Notification.requestPermission();
+                    if (result !== "granted") {
+                        setStatus(
+                            "info",
+                            "Toasts not enabled",
+                            "HumanLoop will stay title-only until you allow browser notifications.",
+                        );
+                        updateNotificationToggle();
+                        return;
+                    }
+
+                    writeToastPreference(true);
+                    updateNotificationToggle();
+                    setStatus(
+                        "success",
+                        "Toasts enabled",
+                        "HumanLoop will raise a desktop toast when new prompts arrive while the inbox is in the background.",
+                    );
+                    showToastNotification(
+                        "HumanLoop notifications enabled",
+                        "You will see a desktop alert when new prompts arrive.",
+                    );
+                    return;
+                }
+
+                const nextEnabled = !readToastPreference();
+                writeToastPreference(nextEnabled);
+                updateNotificationToggle();
+
+                if (nextEnabled) {
+                    setStatus(
+                        "success",
+                        "Toasts enabled",
+                        "HumanLoop will raise a desktop toast when new prompts arrive while the inbox is in the background.",
+                    );
+                    showToastNotification(
+                        "HumanLoop notifications enabled",
+                        "You will see a desktop alert when new prompts arrive.",
+                    );
+                    return;
+                }
+
+                setStatus(
+                    "info",
+                    "Toasts paused",
+                    "Desktop alerts are off for this browser profile. The title and inbox counts will keep updating.",
                 );
             }
 
@@ -887,8 +1183,28 @@
             });
 
             document
+                .getElementById("notification-toggle-button")
+                ?.addEventListener("click", () => void handleNotificationToggle());
+
+            document
                 .getElementById("shortcut-help-toggle")
                 ?.addEventListener("click", () => toggleShortcutHelp());
+
+            document.body.addEventListener("htmx:afterSwap", (event) => {
+                const target = event.target;
+                if (!(target instanceof HTMLElement)) {
+                    return;
+                }
+
+                if (
+                    target.matches(CURRENT_PROMPT_SELECTOR) ||
+                    target.matches(QUEUE_RAIL_SELECTOR)
+                ) {
+                    applyExternalQueueSignals();
+                }
+            });
+
+            applyExternalQueueSignals();
         })();
     </script>
 </body>

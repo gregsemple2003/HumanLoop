@@ -1,0 +1,64 @@
+# task-0001-bug1
+
+## Summary
+
+Integration bug tracked under `task-0001`, not a new implementation pass.
+
+Current symptom:
+
+- launching the running HumanLoop app and pressing `Copy` can leave the current prompt stuck in its in-flight state
+- the visible prompt stays on screen with the copy workflow apparently hung instead of resolving to `Copied` or a clipboard error state
+- the operator loop is blocked because the action bar remains busy and the prompt does not return to a stable ready state
+- this bug matters even though the queue is intentionally sticky after copy, because the UI should only stay on the same prompt after the copy action resolves cleanly
+
+## Why This Is Separate From A New Pass
+
+- this investigation is validating a workflow that should already work at the current pass-5 baseline
+- the issue is being tracked as a bug against the existing pass-4 and pass-5 operator workflow, not as new scope
+- `task-0001` still remains focused on the local manual-handoff inbox described in [TASK.md](/c:/Agent/HumanLoop/Tracking/task-0001/TASK.md)
+
+## Current Evidence
+
+- the reported user-facing symptom is reproducible in an automated PySide6 probe against a live localhost server when the current prompt's `Copy` button is mouse-clicked inside a raw `QWebEngineView`
+- [tests/integration/test_desktop_clipboard.py](/c:/Agent/HumanLoop/tests/integration/test_desktop_clipboard.py) now proves the default shell behavior can leave the current prompt busy with no success or error status transition and no copy-count increment
+- the same regression test proves the hang disappears when the desktop webview enables `JavascriptCanAccessClipboard` before loading the inbox
+- the live copy handler in [inbox.html](/c:/Agent/HumanLoop/app/templates/inbox.html) sets the current prompt busy with `setBusy(true, "Copying prompt...")` before awaiting `navigator.clipboard.writeText(promptText)`
+- the native wrapper in [desktop.py](/c:/Agent/HumanLoop/app/desktop.py) previously hosted the inbox in `QWebEngineView` without enabling JavaScript clipboard access, which left the mouse-triggered copy path able to stall in-flight
+- [PASS_4_AUDIT.md](/c:/Agent/HumanLoop/Tracking/task-0001/Testing/PASS_4_AUDIT.md) and [PASS_5_AUDIT.md](/c:/Agent/HumanLoop/Tracking/task-0001/Testing/PASS_5_AUDIT.md) still explain why earlier proof missed this: they covered rendered JavaScript and localhost API seams, not a real desktop-shell click-driven clipboard write
+
+## Debugging Path So Far
+
+1. Reviewed the task handoff and prior pass audits to compare the reported bug against the repo's current proof baseline.
+2. Confirmed that the existing pass-4 and pass-5 evidence stops at rendered JavaScript and localhost seam checks rather than a real clipboard interaction in a live app window.
+3. Read the copy workflow in [inbox.html](/c:/Agent/HumanLoop/app/templates/inbox.html) and confirmed that the current card is marked busy before the code awaits `navigator.clipboard.writeText(promptText)`.
+4. Probed PySide6 `QWebEngineView` directly and confirmed that `navigator.clipboard.writeText(...)` remains unresolved when invoked without the desktop clipboard setting enabled.
+5. Automated the live-shell mouse-click path and reproduced the visible hang: the current card stays `aria-busy="true"`, the status block stays on its initial informational text, and the server-side `copy_count` remains `0`.
+6. Ran a control probe against the keyboard shortcut path and observed a clean failure state rather than a hang, which narrowed the issue to the click-driven desktop clipboard path instead of the queue API.
+7. Enabled `JavascriptCanAccessClipboard` on the desktop webview, re-ran the same mouse-click automation, and confirmed the prompt resolves to `Copied` with `copy_count = 1`.
+8. Added automated regression coverage for both the raw broken baseline and the fixed HumanLoop desktop configuration, then re-ran the touched and full pytest suites successfully.
+
+## Confirmed Root Cause
+
+The bug was a desktop-shell clipboard configuration gap, not a queue-state bug:
+
+- HumanLoop's copy workflow waits on `navigator.clipboard.writeText(promptText)` before recording the copy event
+- the embedded `QWebEngineView` was not enabling JavaScript clipboard access
+- in the live mouse-click path that meant the desktop shell could leave the copy promise unresolved, so the `finally` branch never ran and the prompt stayed busy
+- once [desktop.py](/c:/Agent/HumanLoop/app/desktop.py) enables `JavascriptCanAccessClipboard`, the same desktop-shell mouse click resolves cleanly and records the copy event without advancing the queue
+
+## Files Currently Relevant
+
+- [inbox.html](/c:/Agent/HumanLoop/app/templates/inbox.html)
+- [current_prompt.html](/c:/Agent/HumanLoop/app/templates/partials/current_prompt.html)
+- [desktop.py](/c:/Agent/HumanLoop/app/desktop.py)
+- [test_inbox_ui.py](/c:/Agent/HumanLoop/tests/test_inbox_ui.py)
+- [test_desktop.py](/c:/Agent/HumanLoop/tests/test_desktop.py)
+- [test_desktop_clipboard.py](/c:/Agent/HumanLoop/tests/integration/test_desktop_clipboard.py)
+- [PASS_4_AUDIT.md](/c:/Agent/HumanLoop/Tracking/task-0001/Testing/PASS_4_AUDIT.md)
+- [PASS_5_AUDIT.md](/c:/Agent/HumanLoop/Tracking/task-0001/Testing/PASS_5_AUDIT.md)
+- [HANDOFF.md](/c:/Agent/HumanLoop/Tracking/task-0001/HANDOFF.md)
+
+## Next Time We Pick This Up
+
+- keep [tests/integration/test_desktop_clipboard.py](/c:/Agent/HumanLoop/tests/integration/test_desktop_clipboard.py) in the release bar whenever the desktop wrapper or copy workflow changes
+- if copy behavior regresses again, compare the raw `QWebEngineView` control case against the configured HumanLoop desktop case first to see whether the issue is the shell configuration or the browser-side workflow

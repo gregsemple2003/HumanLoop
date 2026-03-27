@@ -128,6 +128,24 @@ def count_prompts(
     return int(row["count"])
 
 
+def latest_prompt_seq(
+    connection: sqlite3.Connection,
+    *,
+    status: str = "pending",
+) -> int | None:
+    row = connection.execute(
+        """
+        SELECT MAX(seq) AS seq
+        FROM prompt_items
+        WHERE status = ?
+        """,
+        (status,),
+    ).fetchone()
+    if row is None or row["seq"] is None:
+        return None
+    return int(row["seq"])
+
+
 def get_prompt_by_id(
     connection: sqlite3.Connection,
     prompt_id: str,

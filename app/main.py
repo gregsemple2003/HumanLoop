@@ -6,6 +6,7 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from app.api.inbox import router as inbox_router
 from app.api.prompts import router as prompts_router
@@ -14,6 +15,7 @@ from app.db import initialize_database
 from app.models import HealthzResponse
 
 LOGGER = logging.getLogger("humanloop")
+STATIC_DIRECTORY = Path(__file__).resolve().parent / "static"
 
 
 def configure_logging(level_name: str, log_path: Path) -> None:
@@ -53,6 +55,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = resolved_settings
+    app.mount(
+        "/static",
+        StaticFiles(directory=str(STATIC_DIRECTORY)),
+        name="static",
+    )
     app.include_router(inbox_router)
     app.include_router(prompts_router)
 

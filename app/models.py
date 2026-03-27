@@ -114,5 +114,25 @@ class PromptResponse(BaseModel):
         )
 
 
+class PromptQueueHeadResponse(BaseModel):
+    id: str
+    seq: int
+    source: str
+
+    @classmethod
+    def from_prompt(cls, prompt: PromptItem) -> "PromptQueueHeadResponse":
+        return cls(
+            id=prompt.id,
+            seq=prompt.seq,
+            source=prompt.source,
+        )
+
+
+class PromptQueueSummaryResponse(BaseModel):
+    pending_count: int
+    current_prompt: PromptQueueHeadResponse | None = None
+    latest_pending_seq: int | None = None
+
+
 class HealthzResponse(BaseModel):
     status: Literal["ok"] = "ok"

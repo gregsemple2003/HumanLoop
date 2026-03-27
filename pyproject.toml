@@ -19,9 +19,13 @@ dev = [
     "httpx>=0.28,<1",
     "pytest>=8.4,<9",
 ]
+desktop = [
+    "PySide6>=6.8,<7",
+]
 
 [project.scripts]
 humanloop = "app.main:run"
+humanloop-desktop = "app.desktop:run"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -30,4 +34,9 @@ testpaths = ["tests"]
 include = ["app*"]
 
 [tool.setuptools.package-data]
-app = ["templates/*.html", "templates/partials/*.html"]
+app = [
+    "templates/*.html",
+    "templates/partials/*.html",
+    "static/*",
+    "static/icons/*",
+]

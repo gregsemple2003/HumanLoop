@@ -15,8 +15,8 @@ Pass 3 in `Tracking/task-0001/PLAN.md` covers the server-rendered inbox vertical
 
 Grounding note:
 
-- `exemplars/pass_3_audit.md` was not present in this workspace.
-- This audit grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, `Tracking/task-0001/HANDOFF.md`, the prior audits in `Tracking/task-0001/Testing/pass_1_audit.md` and `Tracking/task-0001/Testing/pass_2_audit.md`, the existing inbox implementation under `app/`, and the closest unit slice in `tests/test_inbox_ui.py`.
+- `exemplars/PASS_3_AUDIT.md` was not present in this workspace.
+- This audit grounded on `Tracking/task-0001/TASK.md`, `Tracking/task-0001/PLAN.md`, `Tracking/task-0001/HANDOFF.md`, the prior audits in `Tracking/task-0001/Testing/PASS_1_AUDIT.md` and `Tracking/task-0001/Testing/PASS_2_AUDIT.md`, the existing inbox implementation under `app/`, and the closest unit slice in `tests/test_inbox_ui.py`.
 
 ## Expansion Summary
 

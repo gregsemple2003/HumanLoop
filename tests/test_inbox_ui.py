@@ -62,6 +62,7 @@ def test_inbox_renders_current_prompt_and_waiting_queue(test_settings) -> None:
 
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/html")
+    assert "<title>HumanLoop Inbox (3 pending)</title>" in html
     assert "Operator inbox" in html
     assert "Current prompt" in html
     assert first_body in html
@@ -74,6 +75,57 @@ def test_inbox_renders_current_prompt_and_waiting_queue(test_settings) -> None:
     assert 'hx-get="/inbox/queue"' in html
     assert 'hx-trigger="every 5s"' in html
     assert 'hx-get="/inbox/current"' not in html
+
+
+def test_inbox_exposes_external_queue_signals_for_title_and_app_badge(
+    test_settings,
+) -> None:
+    with TestClient(create_app(test_settings)) as client:
+        _enqueue_prompt(client, "149", body="Signal prompt body")
+
+        response = client.get("/inbox")
+
+    html = response.text
+
+    assert response.status_code == 200
+    assert "<title>HumanLoop Inbox (1 pending)</title>" in html
+    assert 'rel="manifest" href="/static/manifest.webmanifest"' in html
+    assert 'rel="icon" type="image/svg+xml" href="/static/icons/humanloop-icon.svg"' in html
+    assert 'data-queue-count="1"' in html
+    assert 'data-waiting-count="0"' in html
+    assert "function formatInboxTitle(queueCount)" in html
+    assert 'document.title = formatInboxTitle(queueCount);' in html
+    assert "navigator.setAppBadge(queueCount)" in html
+    assert "navigator.setAppBadge(0)" not in html
+    assert "navigator.clearAppBadge()" in html
+    assert 'document.body.addEventListener("htmx:afterSwap"' in html
+    assert "applyExternalQueueSignals();" in html
+
+
+def test_inbox_renders_toast_notification_controls_and_queue_alert_contract(
+    test_settings,
+) -> None:
+    with TestClient(create_app(test_settings)) as client:
+        _enqueue_prompt(client, "149b", body="Signal prompt body")
+
+        response = client.get("/inbox")
+
+    html = response.text
+
+    assert response.status_code == 200
+    assert 'id="notification-toggle-button"' in html
+    assert "Enable toasts" in html
+    assert 'const APP_ICON_URL = "/static/icons/humanloop-192.png";' in html
+    assert 'const TOAST_PREFERENCE_KEY = "humanloop.notifications.enabled";' in html
+    assert 'window.localStorage.getItem(TOAST_PREFERENCE_KEY) === "true"' in html
+    assert "Notification.requestPermission()" in html
+    assert 'new Notification(title, {' in html
+    assert 'tag: "humanloop-queue",' in html
+    assert 'showToastNotification(' in html
+    assert "HumanLoop notifications enabled" in html
+    assert "HumanLoop will raise a desktop toast when new prompts arrive while the inbox is in the background." in html
+    assert "Browser notification permission is blocked for this app window." in html
+    assert "void refreshCurrentPromptFromServer();" in html
 
 
 def test_inbox_queue_renders_source_age_and_collapsed_preview(
